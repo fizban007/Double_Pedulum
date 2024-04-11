@@ -111,7 +111,7 @@ gui.add(conf, 'L1', 1.0, 20.0).name('L1').listen();
 gui.add(conf, 'L2', 1.0, 20.0).name('L2').listen();
 gui.add(conf, 'm1', 0.1, 5.0).name('m1').listen();
 gui.add(conf, 'm2', 0.1, 5.0).name('m2').listen();
-gui.add(conf, 'dt', 0.001, 0.1).name('dt').listen();
+gui.add(conf, 'dt', 0.001, 0.1).steps(0.001).name('dt').listen();
 gui.add(conf, 'reset_camera').name('Reset Camera');
 
 var dt = 0.001;
@@ -151,7 +151,7 @@ var rk4 = new RungeKutta4(derives, 0.0, [conf.phi1, conf.dphi1dt, conf.phi2, con
 
 var start_stop_integration = function() {
   if (conf.run) {
-    rk4 = new RungeKutta4(derives, 0.0, [conf.phi1, conf.dphi2dt, conf.phi2, conf.dphi2dt], dt);
+    rk4 = new RungeKutta4(derives, 0.0, [conf.phi1, conf.dphi1dt, conf.phi2, conf.dphi2dt], dt);
     conf.running = true;
     // console.log(conf);
   } else {
