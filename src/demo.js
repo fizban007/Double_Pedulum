@@ -50,6 +50,7 @@ var Config = function () {
   this.g = 9.81;
   this.dt = 0.02;
   this.resistance = 0.0;
+  this.dino = false;
   this.run = false;
   this.running = false;
   this.reset_camera = function() {
@@ -80,11 +81,11 @@ rod1.geometry.translate(0, -0.5, 0);
 rod1.scale.set(1.0, conf.L1, 1.0);
 rod1.rotateX(Math.PI/2);
 pivot1.add(rod1);
-var mass1 = new THREE.Mesh(new THREE.SphereGeometry(1.0, 32, 32),
+var sph1 = new THREE.Mesh(new THREE.SphereGeometry(1.0, 32, 32),
                            new THREE.MeshPhongMaterial({ color: 0xdd0000 }));
-mass1.scale.set(conf.m1**(1/3), conf.m1**(1/3), conf.m1**(1/3));
-mass1.translateZ(-conf.L1);
-pivot1.add(mass1);
+sph1.scale.set(conf.m1**(1/3), conf.m1**(1/3), conf.m1**(1/3));
+sph1.translateZ(-conf.L1);
+pivot1.add(sph1);
 var pivot2 = new THREE.Group();
 pivot1.add(pivot2);
 pivot2.position.set(0, 0, -conf.L1);
@@ -96,11 +97,51 @@ rod2.scale.set(1.0, conf.L2, 1.0);
 rod2.rotateX(Math.PI/2);
 pivot2.add(rod2);
 
-var mass2 = new THREE.Mesh(new THREE.SphereGeometry(1.0, 32, 32),
+var sph2 = new THREE.Mesh(new THREE.SphereGeometry(1.0, 32, 32),
                            new THREE.MeshPhongMaterial({ color: 0x00dd00 }));
-mass2.scale.set(conf.m2**(1/3), conf.m2**(1/3), conf.m2**(1/3));
-mass2.translateZ(-conf.L2);
-pivot2.add(mass2);
+sph2.scale.set(conf.m2**(1/3), conf.m2**(1/3), conf.m2**(1/3));
+sph2.translateZ(-conf.L2);
+pivot2.add(sph2);
+
+var dino1, dino2;
+const obj_scale = 0.7;
+
+// Instantiate a loader
+const loader = new GLTFLoader();
+loader.load(
+  'dinosaur.glb',
+  function ( gltf ) {
+    // called when the resource is loaded
+    var dino = gltf.scene.getObjectByName('Dino_Dino_0');
+    console.log( dino );
+    dino1 = dino;
+    dino1.scale.set(obj_scale * conf.m1**(1/3), obj_scale * conf.m1**(1/3), obj_scale * conf.m1**(1/3));
+    dino1.translateZ(-conf.L1);
+    // dino1.material.color.setHex(0xdd0000);
+    pivot1.add(dino1);
+    dino1.visible = false;
+
+    dino2 = dino.clone();
+    dino2.material = dino1.material.clone();
+    dino2.scale.set(obj_scale * conf.m2**(1/3), obj_scale * conf.m2**(1/3), obj_scale * conf.m2**(1/3));
+    dino2.translateZ(-conf.L2);
+    // dino2.material.color.setHex(0x00dd00);
+    pivot2.add(dino2);
+    dino2.visible = false;
+    dino1.material.color.setHex(0xdd0000);
+    // scene.add( dino );
+    animate();
+  },
+  function ( xhr ) {
+    // called while loading is progressing
+    console.log( `${( xhr.loaded / xhr.total * 100 )}% loaded` );
+  },
+  function ( error ) {
+    // called when loading has errors
+    console.error( 'An error happened', error );
+  }
+);
+
 
 // pivot1.rotateOnWorldAxis(new THREE.Vector3(1.0, 0.0, 0.0), conf.phi1);
 pivot1.setRotationFromAxisAngle(new THREE.Vector3(1.0, 0.0, 0.0), conf.phi1);
@@ -114,6 +155,12 @@ gui.add(conf, 'm1', 0.01, 10.0, 0.01).name('m1').listen();
 gui.add(conf, 'm2', 0.01, 10.0, 0.01).name('m2').listen();
 gui.add(conf, 'resistance', 0.0, 0.5, 0.01).name('resistance').listen();
 gui.add(conf, 'dt', 0.001, 0.1, 0.001).name('dt').listen();
+gui.add(conf, 'dino', false).name('Dino').listen().onChange(function(value) {
+  dino1.visible = value;
+  dino2.visible = value;
+  sph1.visible = !value;
+  sph2.visible = !value;
+});
 gui.add(conf, 'reset_camera').name('Reset Camera');
 
 var dt = 0.001;
@@ -169,13 +216,17 @@ function animate() {
 
   rod1.scale.set(1.0, conf.L1, 1.0);
   // mass1.position.y = conf.L1 * Math.sin(conf.phi1);
-  mass1.position.z = -conf.L1;
-  mass1.scale.set(conf.m1**(1/3), conf.m1**(1/3), conf.m1**(1/3));
+  dino1.position.z = -conf.L1;
+  dino1.scale.set(obj_scale * conf.m1**(1/3), obj_scale * conf.m1**(1/3), obj_scale * conf.m1**(1/3));
+  sph1.position.z = -conf.L1;
+  sph1.scale.set(conf.m1**(1/3), conf.m1**(1/3), conf.m1**(1/3));
   pivot2.position.z = -conf.L1;
   // rod1.translateY(-conf.L1/2);
   rod2.scale.set(1.0, conf.L2, 1.0);
-  mass2.position.z = -conf.L2;
-  mass2.scale.set(conf.m2**(1/3), conf.m2**(1/3), conf.m2**(1/3));
+  dino2.position.z = -conf.L2;
+  dino2.scale.set(obj_scale * conf.m2**(1/3), obj_scale * conf.m2**(1/3), obj_scale * conf.m2**(1/3));
+  sph2.position.z = -conf.L2;
+  sph2.scale.set(conf.m2**(1/3), conf.m2**(1/3), conf.m2**(1/3));
 
   pivot1.setRotationFromAxisAngle(new THREE.Vector3(1.0, 0.0, 0.0), conf.phi1);
   pivot2.setRotationFromAxisAngle(new THREE.Vector3(1.0, 0.0, 0.0), conf.phi2 - conf.phi1);
@@ -200,4 +251,3 @@ function animate() {
   // controls.update();
 }
 
-animate();
