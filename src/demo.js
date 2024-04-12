@@ -45,7 +45,7 @@ var Config = function () {
   this.m2 = 1.0;
   this.phi1 = 0.2;
   this.dphi1dt = 0.0;
-  this.phi2 = 0.5;
+  this.phi2 = 0.282;
   this.dphi2dt = 0.0;
   this.g = 9.81;
   this.dt = 0.02;
@@ -147,8 +147,8 @@ loader.load(
 pivot1.setRotationFromAxisAngle(new THREE.Vector3(1.0, 0.0, 0.0), conf.phi1);
 
 const gui = new GUI();
-gui.add(conf, 'phi1', -2.0*Math.PI, 2.0*Math.PI).name('phi1').listen();
-gui.add(conf, 'phi2', -2.0*Math.PI, 2.0*Math.PI).name('phi2').listen();
+gui.add(conf, 'phi1', -2.0*Math.PI, 2.0*Math.PI, 0.01).name('phi1').listen();
+gui.add(conf, 'phi2', -2.0*Math.PI, 2.0*Math.PI, 0.01).name('phi2').listen();
 gui.add(conf, 'L1', 1.0, 20.0).name('L1').listen();
 gui.add(conf, 'L2', 1.0, 20.0).name('L2').listen();
 gui.add(conf, 'm1', 0.01, 10.0, 0.01).name('m1').listen();
